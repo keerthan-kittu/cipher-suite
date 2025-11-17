@@ -24,6 +24,36 @@ interface RedhawkResult {
   technologies: string[];
   headers: { [key: string]: string };
   subdomains: string[];
+  ports?: any[];
+  ssl?: any;
+  geolocation?: {
+    country?: string;
+    region?: string;
+    city?: string;
+    isp?: string;
+    asn?: string;
+    timezone?: string;
+  };
+  emailAddresses?: string[];
+  socialMedia?: { [key: string]: string };
+  cms?: {
+    name?: string;
+    version?: string;
+    plugins?: string[];
+    themes?: string[];
+  };
+  serverInfo?: {
+    server?: string;
+    poweredBy?: string;
+    framework?: string;
+    language?: string;
+    os?: string;
+  };
+  performance?: {
+    responseTime: number;
+    pageSize: number;
+    loadTime: number;
+  };
 }
 
 export default function RedhawkPage() {
@@ -306,8 +336,7 @@ export default function RedhawkPage() {
                         </div>
 
                         {/* Geolocation */}
-                        {result.geolocation && Object.keys(result.geolocation).length > 0 && (
-                          <div>
+                        <div>
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Geolocation</h3>
                             <div className="p-4 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10">
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -404,7 +433,7 @@ export default function RedhawkPage() {
                         )}
 
                         {/* Email Addresses */}
-                        {result.emailAddresses && result.emailAddresses.length > 0 && (
+                        {result.emailAddresses?.length > 0 && (
                           <div>
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Email Addresses Found</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -439,8 +468,7 @@ export default function RedhawkPage() {
                         )}
 
                         {/* Performance Metrics */}
-                        {result.performance && (
-                          <div>
+                        <div>
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Performance Metrics</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                               <div className="p-4 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10">
@@ -457,10 +485,10 @@ export default function RedhawkPage() {
                               </div>
                             </div>
                           </div>
-                        )}
+                        </div>
 
                         {/* Subdomains */}
-                        {result.subdomains && result.subdomains.length > 0 && (
+                        {result.subdomains?.length > 0 && (
                           <div>
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Discovered Subdomains ({result.subdomains.length})</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">

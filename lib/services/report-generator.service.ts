@@ -1,6 +1,7 @@
 import { renderToBuffer } from '@react-pdf/renderer';
 import { ReportGenerationRequest, VulnercipherReportData } from '../types/report';
 import { VulnercipherReport } from '../templates/vulnercipher-report.template';
+import { RedhawkReport, RedhawkReportData } from '../templates/redhawk-report.template';
 import React from 'react';
 
 export class ReportGeneratorService {
@@ -130,9 +131,13 @@ export class ReportGeneratorService {
           findingsLabel: config.vulnercipher.findingsLabel
         });
       
+      case 'redhawk':
+        return React.createElement(RedhawkReport, {
+          data: data as RedhawkReportData
+        });
+      
       case 'nmap':
       case 'honeypot':
-      case 'redhawk':
         // For now, use the Vulnercipher template as a generic template
         // TODO: Create specific templates for each scan type
         return React.createElement(VulnercipherReport, { 
