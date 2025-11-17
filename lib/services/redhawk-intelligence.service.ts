@@ -109,6 +109,24 @@ export class RedhawkIntelligenceService {
     const discoveredSubdomains = subdomains.status === 'fulfilled' ? subdomains.value : [];
     const geo = geolocation.status === 'fulfilled' ? geolocation.value : {};
 
+    // Log what was gathered
+    console.log('Intelligence gathering results:', {
+      whoisSuccess: whoisData.status === 'fulfilled',
+      dnsSuccess: dnsRecords.status === 'fulfilled',
+      httpSuccess: httpData.status === 'fulfilled',
+      subdomainsSuccess: subdomains.status === 'fulfilled',
+      geolocationSuccess: geolocation.status === 'fulfilled',
+      httpDataKeys: Object.keys(http),
+      geoKeys: Object.keys(geo),
+    });
+
+    if (httpData.status === 'rejected') {
+      console.error('HTTP data gathering failed:', httpData.reason);
+    }
+    if (geolocation.status === 'rejected') {
+      console.error('Geolocation failed:', geolocation.reason);
+    }
+
     return {
       domain: cleanDomain,
       ip: dns.A?.[0] || 'Unknown',
@@ -185,7 +203,7 @@ export class RedhawkIntelligenceService {
       // Extract SSL information
       const ssl = await this.getSSLInfo(domain, protocol);
 
-      return {
+      const httpData = {
         technologies,
         headers,
         ports,
@@ -200,8 +218,22 @@ export class RedhawkIntelligenceService {
           loadTime,
         },
       };
+
+      console.log('HTTP Intelligence gathered:', {
+        technologiesCount: technologies.length,
+        headersCount: Object.keys(headers).length,
+        portsCount: ports.length,
+        emailsCount: emailAddresses.length,
+        socialMediaCount: Object.keys(socialMedia).length,
+        hasCMS: !!cms.name,
+        hasServerInfo: Object.keys(serverInfo).length > 0,
+      });
+
+      return httpData;
     } catch (error) {
       console.error('HTTP intelligence gathering error:', error);
+      console.error('Error details:', error instanceof Error ? error.message : 'Unknown error');
+      console.error('Stack:', error instanceof Error ? error.stack : 'No stack trace');
       return this.getDefaultHttpData();
     }
   }

@@ -86,6 +86,13 @@ export default function RedhawkPage() {
       setProgress(100);
 
       if (result.success && result.data) {
+        console.log('RedHawk scan result:', result.data);
+        console.log('Geolocation:', result.data.geolocation);
+        console.log('Server Info:', result.data.serverInfo);
+        console.log('CMS:', result.data.cms);
+        console.log('Email Addresses:', result.data.emailAddresses);
+        console.log('Social Media:', result.data.socialMedia);
+        console.log('Performance:', result.data.performance);
         setResult(result.data);
       } else {
         alert(`Scan failed: ${result.error || 'Unknown error'}`);
