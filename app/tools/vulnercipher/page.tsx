@@ -24,6 +24,7 @@ export default function VulnercipherPage() {
   const [progress, setProgress] = useState(0);
   const [vulnerabilities, setVulnerabilities] = useState<Vulnerability[]>([]);
   const [scanComplete, setScanComplete] = useState(false);
+  const [deepScan, setDeepScan] = useState(false);
 
   const mockVulnerabilities: Vulnerability[] = [
     {
@@ -74,13 +75,13 @@ export default function VulnercipherPage() {
     }, 300);
 
     try {
-      // Call real API
+      // Call real API with deep scan option
       const response = await fetch('/api/scan/vulnercipher', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ target }),
+        body: JSON.stringify({ target, deepScan }),
       });
 
       const result = await response.json();
@@ -170,6 +171,23 @@ export default function VulnercipherPage() {
                         className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-background-dark text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
                         disabled={scanning}
                       />
+                    </div>
+
+                    <div className="flex items-center gap-3 p-4 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10">
+                      <input
+                        type="checkbox"
+                        id="deepScan"
+                        checked={deepScan}
+                        onChange={(e) => setDeepScan(e.target.checked)}
+                        disabled={scanning}
+                        className="w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary"
+                      />
+                      <label htmlFor="deepScan" className="flex-1 cursor-pointer">
+                        <div className="font-medium text-gray-900 dark:text-white">Deep Scan</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                          Perform additional checks for information disclosure, debug info, and default pages (takes longer)
+                        </div>
+                      </label>
                     </div>
 
                     <button
