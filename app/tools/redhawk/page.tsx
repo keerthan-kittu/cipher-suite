@@ -298,17 +298,173 @@ export default function RedhawkPage() {
                           </div>
                         </div>
 
-                        {/* Subdomains */}
-                        <div>
-                          <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Discovered Subdomains</h3>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            {result.subdomains.map((subdomain, idx) => (
-                              <div key={idx} className="p-3 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10 text-sm font-mono text-gray-600 dark:text-gray-400">
-                                {subdomain}
+                        {/* Geolocation */}
+                        {result.geolocation && Object.keys(result.geolocation).length > 0 && (
+                          <div>
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Geolocation</h3>
+                            <div className="p-4 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                                {result.geolocation.country && (
+                                  <div>
+                                    <span className="font-medium text-gray-700 dark:text-gray-300">Country: </span>
+                                    <span className="text-gray-600 dark:text-gray-400">{result.geolocation.country}</span>
+                                  </div>
+                                )}
+                                {result.geolocation.city && (
+                                  <div>
+                                    <span className="font-medium text-gray-700 dark:text-gray-300">City: </span>
+                                    <span className="text-gray-600 dark:text-gray-400">{result.geolocation.city}</span>
+                                  </div>
+                                )}
+                                {result.geolocation.isp && (
+                                  <div>
+                                    <span className="font-medium text-gray-700 dark:text-gray-300">ISP: </span>
+                                    <span className="text-gray-600 dark:text-gray-400">{result.geolocation.isp}</span>
+                                  </div>
+                                )}
+                                {result.geolocation.timezone && (
+                                  <div>
+                                    <span className="font-medium text-gray-700 dark:text-gray-300">Timezone: </span>
+                                    <span className="text-gray-600 dark:text-gray-400">{result.geolocation.timezone}</span>
+                                  </div>
+                                )}
                               </div>
-                            ))}
+                            </div>
                           </div>
-                        </div>
+                        )}
+
+                        {/* Server Information */}
+                        {result.serverInfo && Object.keys(result.serverInfo).length > 0 && (
+                          <div>
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Server Information</h3>
+                            <div className="p-4 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                                {result.serverInfo.server && (
+                                  <div>
+                                    <span className="font-medium text-gray-700 dark:text-gray-300">Server: </span>
+                                    <span className="text-gray-600 dark:text-gray-400">{result.serverInfo.server}</span>
+                                  </div>
+                                )}
+                                {result.serverInfo.os && (
+                                  <div>
+                                    <span className="font-medium text-gray-700 dark:text-gray-300">OS: </span>
+                                    <span className="text-gray-600 dark:text-gray-400">{result.serverInfo.os}</span>
+                                  </div>
+                                )}
+                                {result.serverInfo.framework && (
+                                  <div>
+                                    <span className="font-medium text-gray-700 dark:text-gray-300">Framework: </span>
+                                    <span className="text-gray-600 dark:text-gray-400">{result.serverInfo.framework}</span>
+                                  </div>
+                                )}
+                                {result.serverInfo.language && (
+                                  <div>
+                                    <span className="font-medium text-gray-700 dark:text-gray-300">Language: </span>
+                                    <span className="text-gray-600 dark:text-gray-400">{result.serverInfo.language}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* CMS Detection */}
+                        {result.cms && result.cms.name && (
+                          <div>
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">CMS Detection</h3>
+                            <div className="p-4 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10">
+                              <div className="space-y-3 text-sm">
+                                <div>
+                                  <span className="font-medium text-gray-700 dark:text-gray-300">CMS: </span>
+                                  <span className="text-gray-600 dark:text-gray-400">{result.cms.name}</span>
+                                  {result.cms.version && <span className="text-gray-600 dark:text-gray-400"> v{result.cms.version}</span>}
+                                </div>
+                                {result.cms.plugins && result.cms.plugins.length > 0 && (
+                                  <div>
+                                    <span className="font-medium text-gray-700 dark:text-gray-300">Plugins: </span>
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                      {result.cms.plugins.map((plugin, idx) => (
+                                        <span key={idx} className="px-2 py-1 rounded bg-blue-500/10 text-blue-500 text-xs">
+                                          {plugin}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Email Addresses */}
+                        {result.emailAddresses && result.emailAddresses.length > 0 && (
+                          <div>
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Email Addresses Found</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              {result.emailAddresses.map((email, idx) => (
+                                <div key={idx} className="p-3 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10 text-sm font-mono text-gray-600 dark:text-gray-400">
+                                  {email}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Social Media */}
+                        {result.socialMedia && Object.keys(result.socialMedia).length > 0 && (
+                          <div>
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Social Media Profiles</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              {Object.entries(result.socialMedia).map(([platform, url]) => (
+                                <a
+                                  key={platform}
+                                  href={url as string}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-3 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10 hover:border-primary transition-colors"
+                                >
+                                  <div className="font-medium text-gray-700 dark:text-gray-300 capitalize">{platform}</div>
+                                  <div className="text-sm text-primary truncate">{url as string}</div>
+                                </a>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Performance Metrics */}
+                        {result.performance && (
+                          <div>
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Performance Metrics</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                              <div className="p-4 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10">
+                                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Response Time</div>
+                                <div className="text-2xl font-bold text-primary">{result.performance.responseTime}ms</div>
+                              </div>
+                              <div className="p-4 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10">
+                                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Page Size</div>
+                                <div className="text-2xl font-bold text-primary">{(result.performance.pageSize / 1024).toFixed(2)}KB</div>
+                              </div>
+                              <div className="p-4 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10">
+                                <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Load Time</div>
+                                <div className="text-2xl font-bold text-primary">{result.performance.loadTime}ms</div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Subdomains */}
+                        {result.subdomains && result.subdomains.length > 0 && (
+                          <div>
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Discovered Subdomains ({result.subdomains.length})</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              {result.subdomains.map((subdomain, idx) => (
+                                <div key={idx} className="p-3 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10 text-sm font-mono text-gray-600 dark:text-gray-400">
+                                  {subdomain}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </>

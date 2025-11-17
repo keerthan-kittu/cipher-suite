@@ -90,6 +90,14 @@ export interface RedhawkResult {
   technologies: string[];
   headers: Record<string, string>;
   subdomains: string[];
+  ports?: any[];
+  ssl?: any;
+  geolocation?: any;
+  emailAddresses?: string[];
+  socialMedia?: Record<string, string>;
+  cms?: any;
+  serverInfo?: any;
+  performance?: any;
 }
 
 /**

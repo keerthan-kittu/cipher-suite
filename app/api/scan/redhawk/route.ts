@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { config } from '@/lib/config/env.config';
-import { WhoisService } from '@/lib/services/whois.service';
-import { DnsService } from '@/lib/services/dns.service';
-import { makeHttpRequest, detectTechnologies, extractSecurityHeaders } from '@/lib/utils/http-client';
+import { RedhawkIntelligenceService } from '@/lib/services/redhawk-intelligence.service';
 
 interface RedhawkScanRequest {
   target: string;
@@ -31,8 +28,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Perform real intelligence gathering
-    const result = await gatherIntelligence(cleanDomain);
+    // Perform comprehensive intelligence gathering
+    const intelligenceService = new RedhawkIntelligenceService();
+    const result = await intelligenceService.gather(cleanDomain);
 
     return NextResponse.json({
       success: true,
@@ -48,105 +46,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-async function gatherIntelligence(domain: string) {
-  const whoisService = new WhoisService();
-  const dnsService = new DnsService();
-
-  // Perform parallel lookups
-  const [whoisData, dnsRecords, httpResponse] = await Promise.allSettled([
-    whoisService.lookup(domain),
-    dnsService.lookup(domain),
-    makeHttpRequest(`https://${domain}`, { timeout: 10000 }).catch(() =>
-      makeHttpRequest(`http://${domain}`, { timeout: 10000 })
-    ),
-  ]);
-
-  // Extract WHOIS data
-  const whois = whoisData.status === 'fulfilled' ? whoisData.value : {};
-
-  // Log WHOIS data for debugging
-  if (config.logging.enableDebug) {
-    console.log('WHOIS lookup result:', whoisData);
-  }
-
-  // Extract DNS records
-  const dns = dnsRecords.status === 'fulfilled' ? dnsRecords.value : {};
-
-  // Extract HTTP data
-  let technologies: string[] = [];
-  let headers: Record<string, string> = {};
-  let ip = dns.A?.[0] || 'Unknown';
-
-  if (httpResponse.status === 'fulfilled') {
-    technologies = detectTechnologies(httpResponse.value);
-    headers = extractSecurityHeaders(httpResponse.value.headers);
-  }
-
-  // Build subdomain list (common subdomains)
-  const subdomains = await discoverSubdomains(domain, dnsService);
-
-  // Use DNS nameservers as fallback if WHOIS doesn't have them
-  const nameServers = whois.nameServers && whois.nameServers.length > 0
-    ? whois.nameServers
-    : dns.NS || [];
-
-  // Check if WHOIS data is available
-  const hasWhoisData = whois.registrar || whois.createdDate || whois.expiryDate;
-  const whoisMessage = hasWhoisData ? null : 'WHOIS data not available (may be privacy protected or subdomain)';
-
-  return {
-    domain,
-    ip,
-    whois: {
-      registrar: whois.registrar || whoisMessage || 'Not Available',
-      createdDate: whois.createdDate || whoisMessage || 'Not Available',
-      expiryDate: whois.expiryDate || whoisMessage || 'Not Available',
-      updatedDate: whois.updatedDate || whoisMessage || 'Not Available',
-      nameServers: nameServers,
-      status: whois.status || [],
-      registrantOrganization: whois.registrantOrganization,
-      registrantCountry: whois.registrantCountry,
-    },
-    dns: {
-      A: dns.A || [],
-      AAAA: dns.AAAA || [],
-      MX: dns.MX || [],
-      NS: dns.NS || [],
-      TXT: dns.TXT || [],
-      CNAME: dns.CNAME,
-    },
-    technologies: technologies.length > 0 ? technologies : ['Unknown'],
-    headers,
-    subdomains,
-  };
-}
-
-async function discoverSubdomains(domain: string, dnsService: DnsService): Promise<string[]> {
-  const commonSubdomains = ['www', 'mail', 'ftp', 'blog', 'shop', 'api', 'cdn', 'app', 'dev', 'staging'];
-  const discovered: string[] = [];
-
-  // Check common subdomains in parallel
-  const checks = commonSubdomains.map(async (sub) => {
-    const subdomain = `${sub}.${domain}`;
-    try {
-      const ips = await dnsService.resolveHostname(subdomain);
-      if (ips.length > 0) {
-        return subdomain;
-      }
-    } catch {
-      // Subdomain doesn't exist
-    }
-    return null;
-  });
-
-  const results = await Promise.all(checks);
-  
-  // Filter out nulls and add to discovered list
-  results.forEach(result => {
-    if (result) discovered.push(result);
-  });
-
-  return discovered;
 }
