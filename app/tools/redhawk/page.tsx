@@ -245,16 +245,23 @@ export default function RedhawkPage() {
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white">DNS Records</h3>
                           </div>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {Object.entries(result.dns).map(([type, records]) => (
-                              <div key={type} className="p-4 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10">
-                                <div className="font-medium text-gray-700 dark:text-gray-300 mb-2">{type} Records</div>
-                                <div className="space-y-1">
-                                  {records.map((record, idx) => (
-                                    <div key={idx} className="text-sm text-gray-600 dark:text-gray-400 font-mono">{record}</div>
-                                  ))}
+                            {Object.entries(result.dns).map(([type, records]) => {
+                              // Handle both array and single value records
+                              const recordArray = Array.isArray(records) ? records : [records];
+                              
+                              return (
+                                <div key={type} className="p-4 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10">
+                                  <div className="font-medium text-gray-700 dark:text-gray-300 mb-2">{type} Records</div>
+                                  <div className="space-y-1">
+                                    {recordArray.map((record, idx) => (
+                                      <div key={idx} className="text-sm text-gray-600 dark:text-gray-400 font-mono">
+                                        {typeof record === 'object' ? JSON.stringify(record) : String(record)}
+                                      </div>
+                                    ))}
+                                  </div>
                                 </div>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         </div>
 
