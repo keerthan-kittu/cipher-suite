@@ -36,7 +36,7 @@ export class DnsService {
     // Lookup A records (IPv4)
     try {
       const aRecords = await dns.resolve4(cleanDomain);
-      if (aRecords.length > 0) {
+      if (Array.isArray(aRecords) && aRecords.length > 0) {
         records.A = aRecords;
       }
     } catch (error) {
@@ -46,7 +46,7 @@ export class DnsService {
     // Lookup AAAA records (IPv6)
     try {
       const aaaaRecords = await dns.resolve6(cleanDomain);
-      if (aaaaRecords.length > 0) {
+      if (Array.isArray(aaaaRecords) && aaaaRecords.length > 0) {
         records.AAAA = aaaaRecords;
       }
     } catch (error) {
@@ -56,7 +56,7 @@ export class DnsService {
     // Lookup MX records (Mail Exchange)
     try {
       const mxRecords = await dns.resolveMx(cleanDomain);
-      if (mxRecords.length > 0) {
+      if (Array.isArray(mxRecords) && mxRecords.length > 0) {
         records.MX = mxRecords
           .sort((a, b) => a.priority - b.priority)
           .map(mx => `${mx.exchange} (priority: ${mx.priority})`);
@@ -68,7 +68,7 @@ export class DnsService {
     // Lookup NS records (Name Servers)
     try {
       const nsRecords = await dns.resolveNs(cleanDomain);
-      if (nsRecords.length > 0) {
+      if (Array.isArray(nsRecords) && nsRecords.length > 0) {
         records.NS = nsRecords;
       }
     } catch (error) {
@@ -78,8 +78,10 @@ export class DnsService {
     // Lookup TXT records
     try {
       const txtRecords = await dns.resolveTxt(cleanDomain);
-      if (txtRecords.length > 0) {
-        records.TXT = txtRecords.map(record => record.join(''));
+      if (Array.isArray(txtRecords) && txtRecords.length > 0) {
+        records.TXT = txtRecords.map(record => 
+          Array.isArray(record) ? record.join('') : String(record)
+        );
       }
     } catch (error) {
       // TXT records not found or error
@@ -88,7 +90,7 @@ export class DnsService {
     // Lookup CNAME record
     try {
       const cnameRecords = await dns.resolveCname(cleanDomain);
-      if (cnameRecords.length > 0) {
+      if (Array.isArray(cnameRecords) && cnameRecords.length > 0) {
         records.CNAME = cnameRecords[0];
       }
     } catch (error) {
