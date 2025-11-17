@@ -23,7 +23,21 @@ export class WhoisService {
   async lookup(domain: string): Promise<WhoisData> {
     try {
       // Remove protocol and path if present
-      const cleanDomain = domain.replace(/^https?:\/\//, '').split('/')[0];
+      let cleanDomain = domain.replace(/^https?:\/\//, '').split('/')[0];
+      
+      // Extract root domain for subdomains (e.g., subdomain.vercel.app -> vercel.app)
+      const domainParts = cleanDomain.split('.');
+      if (domainParts.length > 2) {
+        // Check if it's a common subdomain pattern
+        const commonSubdomains = ['www', 'api', 'app', 'cdn', 'mail', 'ftp', 'blog', 'shop', 'dev', 'staging'];
+        const firstPart = domainParts[0].toLowerCase();
+        
+        // If first part is a common subdomain or looks like a subdomain, use root domain
+        if (commonSubdomains.includes(firstPart) || domainParts.length > 3) {
+          cleanDomain = domainParts.slice(-2).join('.');
+          console.log(`Subdomain detected, using root domain: ${cleanDomain}`);
+        }
+      }
       
       // Perform WHOIS lookup with whoiser
       const result = await whoisDomain(cleanDomain, { 
@@ -31,17 +45,31 @@ export class WhoisService {
         follow: 2 // Follow up to 2 referrals
       });
       
-      // Always log the raw result to help debug
-      console.log('=== WHOIS RAW RESULT for', cleanDomain, '===');
-      console.log(JSON.stringify(result, null, 2));
-      console.log('=== END WHOIS RAW RESULT ===');
+      // Check if result contains errors
+      const hasError = Object.values(result).some((value: any) => 
+        value && typeof value === 'object' && value.error
+      );
+      
+      if (hasError) {
+        console.log('WHOIS lookup returned error:', result);
+        return {};
+      }
+      
+      // Log only in debug mode
+      if (process.env.ENABLE_DEBUG_LOGGING === 'true') {
+        console.log('=== WHOIS RAW RESULT for', cleanDomain, '===');
+        console.log(JSON.stringify(result, null, 2));
+        console.log('=== END WHOIS RAW RESULT ===');
+      }
       
       // Parse the result
       const parsed = this.parseWhoisResult(result, cleanDomain);
       
-      console.log('=== WHOIS PARSED RESULT ===');
-      console.log(JSON.stringify(parsed, null, 2));
-      console.log('=== END WHOIS PARSED RESULT ===');
+      if (process.env.ENABLE_DEBUG_LOGGING === 'true') {
+        console.log('=== WHOIS PARSED RESULT ===');
+        console.log(JSON.stringify(parsed, null, 2));
+        console.log('=== END WHOIS PARSED RESULT ===');
+      }
       
       return parsed;
     } catch (error) {
@@ -80,12 +108,6 @@ export class WhoisService {
       return whoisData;
     }
 
-    // Log for debugging
-    if (process.env.ENABLE_DEBUG_LOGGING === 'true') {
-      console.log('WHOIS parsed data keys:', Object.keys(detailedData));
-      console.log('WHOIS full data:', JSON.stringify(detailedData, null, 2));
-    }
-
     // Helper function to find value with multiple possible keys (case-insensitive)
     const findValue = (obj: any, possibleKeys: string[]): any => {
       // First try exact match (case-insensitive)
@@ -94,7 +116,6 @@ export class WhoisService {
           if (objKey.toLowerCase() === searchKey.toLowerCase()) {
             const value = obj[objKey];
             if (value !== null && value !== undefined && value !== '') {
-              console.log(`Found exact match: ${objKey} = ${value}`);
               return value;
             }
           }
@@ -109,19 +130,16 @@ export class WhoisService {
           if (normalizedKey === normalizedSearch || normalizedKey.includes(normalizedSearch)) {
             const value = obj[objKey];
             if (value !== null && value !== undefined && value !== '') {
-              console.log(`Found partial match: ${objKey} = ${value}`);
               return value;
             }
           }
         }
       }
       
-      console.log(`No match found for keys: ${possibleKeys.join(', ')}`);
       return undefined;
     };
 
     // Registrar
-    console.log('Looking for Registrar...');
     whoisData.registrar = findValue(detailedData, [
       'Registrar', // Exact match from whoiser
       'Registrar Name',
@@ -134,7 +152,6 @@ export class WhoisService {
     ]);
 
     // Created Date
-    console.log('Looking for Created Date...');
     whoisData.createdDate = this.parseDate(
       findValue(detailedData, [
         'Created Date', // Exact match from whoiser
@@ -154,7 +171,6 @@ export class WhoisService {
     );
 
     // Expiry Date
-    console.log('Looking for Expiry Date...');
     whoisData.expiryDate = this.parseDate(
       findValue(detailedData, [
         'Expiry Date', // Exact match from whoiser
@@ -176,7 +192,6 @@ export class WhoisService {
     );
 
     // Updated Date
-    console.log('Looking for Updated Date...');
     whoisData.updatedDate = this.parseDate(
       findValue(detailedData, [
         'Updated Date', // Exact match from whoiser

@@ -92,18 +92,22 @@ async function gatherIntelligence(domain: string) {
     ? whois.nameServers
     : dns.NS || [];
 
+  // Check if WHOIS data is available
+  const hasWhoisData = whois.registrar || whois.createdDate || whois.expiryDate;
+  const whoisMessage = hasWhoisData ? null : 'WHOIS data not available (may be privacy protected or subdomain)';
+
   return {
     domain,
     ip,
     whois: {
-      registrar: whois.registrar || 'Not Available',
-      createdDate: whois.createdDate || 'Not Available',
-      expiryDate: whois.expiryDate || 'Not Available',
-      updatedDate: whois.updatedDate || 'Not Available',
+      registrar: whois.registrar || whoisMessage || 'Not Available',
+      createdDate: whois.createdDate || whoisMessage || 'Not Available',
+      expiryDate: whois.expiryDate || whoisMessage || 'Not Available',
+      updatedDate: whois.updatedDate || whoisMessage || 'Not Available',
       nameServers: nameServers,
       status: whois.status || [],
-      registrantOrganization: whois.registrantOrganization || 'Not Available',
-      registrantCountry: whois.registrantCountry || 'Not Available',
+      registrantOrganization: whois.registrantOrganization,
+      registrantCountry: whois.registrantCountry,
     },
     dns: {
       A: dns.A || [],
