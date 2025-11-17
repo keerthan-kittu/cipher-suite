@@ -31,8 +31,10 @@ export interface Vulnerability {
   severity: 'critical' | 'high' | 'medium' | 'low';
   title: string;
   description: string;
+  cause?: string;
   affected: string;
   recommendation: string;
+  hasSolution?: boolean;
 }
 
 /**

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Header from '@/app/components/Header';
 import Footer from '@/app/components/Footer';
 import { PDFExportButton } from '@/app/components/PDFExportButton';
+import SolutionButton from '@/app/components/SolutionButton';
 import { Scanner, PlayArrow, Download, Warning, CheckCircle, Error } from '@mui/icons-material';
 
 interface Vulnerability {
@@ -11,8 +12,10 @@ interface Vulnerability {
   severity: 'critical' | 'high' | 'medium' | 'low';
   title: string;
   description: string;
+  cause?: string;
   affected: string;
   recommendation: string;
+  hasSolution?: boolean;
 }
 
 export default function VulnercipherPage() {
@@ -256,16 +259,36 @@ export default function VulnercipherPage() {
                                 {vuln.severity}
                               </span>
                             </div>
-                            <p className="text-gray-600 dark:text-gray-400 mb-3">{vuln.description}</p>
-                            <div className="space-y-2 text-sm">
+                            
+                            <div className="space-y-3 text-sm">
+                              <div>
+                                <span className="font-medium text-gray-700 dark:text-gray-300">Description: </span>
+                                <p className="text-gray-600 dark:text-gray-400 mt-1">{vuln.description}</p>
+                              </div>
+                              
+                              {vuln.cause && (
+                                <div>
+                                  <span className="font-medium text-gray-700 dark:text-gray-300">Root Cause: </span>
+                                  <p className="text-gray-600 dark:text-gray-400 mt-1">{vuln.cause}</p>
+                                </div>
+                              )}
+                              
                               <div>
                                 <span className="font-medium text-gray-700 dark:text-gray-300">Affected: </span>
                                 <span className="text-gray-600 dark:text-gray-400">{vuln.affected}</span>
                               </div>
+                              
                               <div>
                                 <span className="font-medium text-gray-700 dark:text-gray-300">Recommendation: </span>
-                                <span className="text-gray-600 dark:text-gray-400">{vuln.recommendation}</span>
+                                <p className="text-gray-600 dark:text-gray-400 mt-1">{vuln.recommendation}</p>
                               </div>
+                              
+                              {vuln.hasSolution && (
+                                <SolutionButton 
+                                  vulnerabilityId={vuln.id}
+                                  vulnerabilityName={vuln.title}
+                                />
+                              )}
                             </div>
                           </div>
                         ))}

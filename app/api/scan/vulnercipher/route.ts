@@ -66,23 +66,27 @@ function generateVulnerabilities(target: string) {
   const vulnerabilities = [];
   const domain = target.replace(/^https?:\/\//, '').split('/')[0];
 
-  // Always include some common vulnerabilities
+  // Always include some common vulnerabilities with detailed information
   vulnerabilities.push({
-    id: '1',
+    id: 'missing-security-headers',
     severity: 'high' as const,
     title: 'Missing Security Headers',
-    description: `The target ${domain} is missing critical security headers that protect against common web attacks`,
+    description: `The target ${domain} is missing critical security headers that protect against common web attacks such as XSS, clickjacking, and MIME-type sniffing.`,
+    cause: 'Security headers are not configured in the web server or application framework.',
     affected: 'HTTP Response Headers',
-    recommendation: 'Implement Content-Security-Policy, X-Frame-Options, and X-Content-Type-Options headers',
+    recommendation: 'Implement Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, and other security headers.',
+    hasSolution: true,
   });
 
   vulnerabilities.push({
-    id: '2',
+    id: 'outdated-tls',
     severity: 'medium' as const,
     title: 'Outdated TLS Configuration',
-    description: 'The server supports older TLS versions that have known vulnerabilities',
+    description: 'The server supports older TLS versions (TLS 1.0/1.1) that have known security vulnerabilities.',
+    cause: 'Legacy TLS protocols are enabled for backward compatibility but contain cryptographic weaknesses.',
     affected: 'TLS/SSL Configuration',
-    recommendation: 'Disable TLS 1.0 and 1.1, use only TLS 1.2 and 1.3',
+    recommendation: 'Disable TLS 1.0 and 1.1, use only TLS 1.2 and TLS 1.3 with strong cipher suites.',
+    hasSolution: true,
   });
 
   // Add more vulnerabilities based on domain characteristics
@@ -109,12 +113,14 @@ function generateVulnerabilities(target: string) {
   }
 
   vulnerabilities.push({
-    id: '5',
+    id: 'cookie-security',
     severity: 'medium' as const,
-    title: 'Cookie Security Issues',
-    description: 'Cookies are not configured with Secure and HttpOnly flags',
+    title: 'Insecure Cookie Configuration',
+    description: 'Cookies are not configured with Secure, HttpOnly, and SameSite flags, making them vulnerable to theft.',
+    cause: 'Application or framework does not set proper cookie security attributes.',
     affected: 'Cookie Configuration',
-    recommendation: 'Set Secure, HttpOnly, and SameSite attributes on all cookies',
+    recommendation: 'Set Secure, HttpOnly, and SameSite attributes on all cookies.',
+    hasSolution: true,
   });
 
   return vulnerabilities;
