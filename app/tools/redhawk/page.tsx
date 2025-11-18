@@ -336,29 +336,30 @@ export default function RedhawkPage() {
                         </div>
 
                         {/* Geolocation */}
-                        <div>
+                        {result.geolocation && Object.keys(result.geolocation).filter(k => result.geolocation?.[k as keyof typeof result.geolocation]).length > 0 && (
+                          <div>
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Geolocation</h3>
                             <div className="p-4 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10">
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                                {result.geolocation.country && (
+                                {result.geolocation?.country && (
                                   <div>
                                     <span className="font-medium text-gray-700 dark:text-gray-300">Country: </span>
                                     <span className="text-gray-600 dark:text-gray-400">{result.geolocation.country}</span>
                                   </div>
                                 )}
-                                {result.geolocation.city && (
+                                {result.geolocation?.city && (
                                   <div>
                                     <span className="font-medium text-gray-700 dark:text-gray-300">City: </span>
                                     <span className="text-gray-600 dark:text-gray-400">{result.geolocation.city}</span>
                                   </div>
                                 )}
-                                {result.geolocation.isp && (
+                                {result.geolocation?.isp && (
                                   <div>
                                     <span className="font-medium text-gray-700 dark:text-gray-300">ISP: </span>
                                     <span className="text-gray-600 dark:text-gray-400">{result.geolocation.isp}</span>
                                   </div>
                                 )}
-                                {result.geolocation.timezone && (
+                                {result.geolocation?.timezone && (
                                   <div>
                                     <span className="font-medium text-gray-700 dark:text-gray-300">Timezone: </span>
                                     <span className="text-gray-600 dark:text-gray-400">{result.geolocation.timezone}</span>
@@ -381,19 +382,19 @@ export default function RedhawkPage() {
                                     <span className="text-gray-600 dark:text-gray-400">{result.serverInfo.server}</span>
                                   </div>
                                 )}
-                                {result.serverInfo.os && (
+                                {result.serverInfo?.os && (
                                   <div>
                                     <span className="font-medium text-gray-700 dark:text-gray-300">OS: </span>
                                     <span className="text-gray-600 dark:text-gray-400">{result.serverInfo.os}</span>
                                   </div>
                                 )}
-                                {result.serverInfo.framework && (
+                                {result.serverInfo?.framework && (
                                   <div>
                                     <span className="font-medium text-gray-700 dark:text-gray-300">Framework: </span>
                                     <span className="text-gray-600 dark:text-gray-400">{result.serverInfo.framework}</span>
                                   </div>
                                 )}
-                                {result.serverInfo.language && (
+                                {result.serverInfo?.language && (
                                   <div>
                                     <span className="font-medium text-gray-700 dark:text-gray-300">Language: </span>
                                     <span className="text-gray-600 dark:text-gray-400">{result.serverInfo.language}</span>
@@ -433,11 +434,11 @@ export default function RedhawkPage() {
                         )}
 
                         {/* Email Addresses */}
-                        {result.emailAddresses?.length > 0 && (
+                        {result.emailAddresses && result.emailAddresses.length > 0 && (
                           <div>
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Email Addresses Found</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                              {result.emailAddresses.map((email, idx) => (
+                              {result.emailAddresses?.map((email, idx) => (
                                 <div key={idx} className="p-3 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10 text-sm font-mono text-gray-600 dark:text-gray-400">
                                   {email}
                                 </div>
@@ -473,19 +474,18 @@ export default function RedhawkPage() {
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                               <div className="p-4 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10">
                                 <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Response Time</div>
-                                <div className="text-2xl font-bold text-primary">{result.performance.responseTime}ms</div>
+                                <div className="text-2xl font-bold text-primary">{result.performance?.responseTime || 0}ms</div>
                               </div>
                               <div className="p-4 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10">
                                 <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Page Size</div>
-                                <div className="text-2xl font-bold text-primary">{(result.performance.pageSize / 1024).toFixed(2)}KB</div>
+                                <div className="text-2xl font-bold text-primary">{((result.performance?.pageSize || 0) / 1024).toFixed(2)}KB</div>
                               </div>
                               <div className="p-4 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10">
                                 <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Load Time</div>
-                                <div className="text-2xl font-bold text-primary">{result.performance.loadTime}ms</div>
+                                <div className="text-2xl font-bold text-primary">{result.performance?.loadTime || 0}ms</div>
                               </div>
                             </div>
                           </div>
-                        </div>
 
                         {/* Subdomains */}
                         {result.subdomains?.length > 0 && (

@@ -175,9 +175,20 @@ export class RedhawkIntelligenceService {
       
       try {
         response = await makeHttpRequest(`https://${domain}`, { timeout: 15000 });
-      } catch {
-        protocol = 'http';
-        response = await makeHttpRequest(`http://${domain}`, { timeout: 15000 });
+      } catch (httpsError) {
+        console.log('HTTPS failed, trying HTTP:', httpsError instanceof Error ? httpsError.message : 'Unknown error');
+        try {
+          protocol = 'http';
+          response = await makeHttpRequest(`http://${domain}`, { timeout: 15000 });
+        } catch (httpError) {
+          console.error('Both HTTPS and HTTP failed:', httpError instanceof Error ? httpError.message : 'Unknown error');
+          throw new Error('Unable to connect to target via HTTP or HTTPS');
+        }
+      }
+
+      // Ensure response exists
+      if (!response || !response.body) {
+        throw new Error('No response received from target');
       }
 
       const loadTime = Date.now() - startTime;
@@ -486,16 +497,25 @@ export class RedhawkIntelligenceService {
 
       const data = JSON.parse(response.body);
 
-      return {
-        country: data.country,
-        region: data.regionName,
-        city: data.city,
-        isp: data.isp,
-        asn: data.as,
-        timezone: data.timezone,
+      // Check if API returned success
+      if (data.status === 'fail') {
+        console.error('Geolocation API error:', data.message);
+        return {};
+      }
+
+      const geoData = {
+        country: data.country || undefined,
+        region: data.regionName || undefined,
+        city: data.city || undefined,
+        isp: data.isp || undefined,
+        asn: data.as || undefined,
+        timezone: data.timezone || undefined,
       };
+
+      console.log('Geolocation data retrieved:', geoData);
+      return geoData;
     } catch (error) {
-      console.error('Geolocation lookup error:', error);
+      console.error('Geolocation lookup error:', error instanceof Error ? error.message : 'Unknown error');
       return {};
     }
   }
