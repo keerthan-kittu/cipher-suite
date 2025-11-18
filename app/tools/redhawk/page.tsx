@@ -267,9 +267,9 @@ export default function RedhawkPage() {
                                 <span className="font-medium text-gray-700 dark:text-gray-300">Expires: </span>
                                 <span className="text-gray-600 dark:text-gray-400">{result.whois.expiryDate}</span>
                               </div>
-                              <div>
+                              <div className="col-span-2">
                                 <span className="font-medium text-gray-700 dark:text-gray-300">Name Servers: </span>
-                                <span className="text-gray-600 dark:text-gray-400">{result.whois.nameServers.join(', ')}</span>
+                                <span className="text-gray-600 dark:text-gray-400 break-all">{result.whois.nameServers.join(', ')}</span>
                               </div>
                             </div>
                           </div>
@@ -291,7 +291,7 @@ export default function RedhawkPage() {
                                   <div className="font-medium text-gray-700 dark:text-gray-300 mb-2">{type} Records</div>
                                   <div className="space-y-1">
                                     {recordArray.map((record, idx) => (
-                                      <div key={idx} className="text-sm text-gray-600 dark:text-gray-400 font-mono">
+                                      <div key={idx} className="text-sm text-gray-600 dark:text-gray-400 font-mono break-all overflow-hidden">
                                         {typeof record === 'object' ? JSON.stringify(record) : String(record)}
                                       </div>
                                     ))}
@@ -439,7 +439,7 @@ export default function RedhawkPage() {
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Email Addresses Found</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                               {result.emailAddresses?.map((email, idx) => (
-                                <div key={idx} className="p-3 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10 text-sm font-mono text-gray-600 dark:text-gray-400">
+                                <div key={idx} className="p-3 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10 text-sm font-mono text-gray-600 dark:text-gray-400 break-all">
                                   {email}
                                 </div>
                               ))}
@@ -493,7 +493,7 @@ export default function RedhawkPage() {
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">Discovered Subdomains ({result.subdomains.length})</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                               {result.subdomains.map((subdomain, idx) => (
-                                <div key={idx} className="p-3 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10 text-sm font-mono text-gray-600 dark:text-gray-400">
+                                <div key={idx} className="p-3 rounded-lg bg-gray-50 dark:bg-background-dark border border-gray-300 dark:border-white/10 text-sm font-mono text-gray-600 dark:text-gray-400 break-all">
                                   {subdomain}
                                 </div>
                               ))}
