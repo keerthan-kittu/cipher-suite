@@ -98,6 +98,14 @@ export interface RedhawkResult {
   cms?: any;
   serverInfo?: any;
   performance?: any;
+  apiKeys?: any[];
+  securityIssues?: any[];
+  metadata?: any;
+  jsLibraries?: string[];
+  analytics?: any[];
+  cdn?: any;
+  robots?: any;
+  sitemap?: any;
 }
 
 /**

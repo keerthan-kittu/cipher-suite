@@ -39,6 +39,7 @@ export interface VulnercipherReportData {
     severity: 'critical' | 'high' | 'medium' | 'low';
     title: string;
     description: string;
+    cause?: string;
     affected: string;
     recommendation: string;
   }>;

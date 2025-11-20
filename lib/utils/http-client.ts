@@ -43,7 +43,7 @@ export class HttpRequestError extends Error {
 }
 
 /**
- * Makes an HTTP request to a target URL
+ * Makes an HTTP request to a target URL with retry logic and comprehensive error handling
  */
 export async function makeHttpRequest(
   url: string,
@@ -53,57 +53,143 @@ export async function makeHttpRequest(
     method = 'GET',
     headers = {},
     body,
-    timeout = config.http.timeout,
+    timeout = 30000, // Increased to 30 seconds for better reliability
     followRedirects = true,
     maxRedirects = config.http.maxRedirects,
   } = options;
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
+  const maxRetries = 3; // Increased retries
+  let lastError: any;
 
-  try {
-    const response = await fetch(url, {
-      method,
-      headers: {
-        'User-Agent': config.http.userAgent,
-        ...headers,
-      },
-      body,
-      signal: controller.signal,
-      redirect: followRedirects ? 'follow' : 'manual',
-    });
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-    clearTimeout(timeoutId);
+    try {
+      console.log(`[HTTP Client] Attempt ${attempt + 1}/${maxRetries + 1} for ${url}`);
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'User-Agent': config.http.userAgent,
+          'Accept': '*/*',
+          'Accept-Encoding': 'gzip, deflate, br',
+          'Connection': 'keep-alive',
+          'Cache-Control': 'no-cache',
+          ...headers,
+        },
+        body,
+        signal: controller.signal,
+        redirect: followRedirects ? 'follow' : 'manual',
+        // @ts-ignore - Next.js specific options
+        cache: 'no-store',
+        // @ts-ignore - Additional fetch options for better compatibility
+        keepalive: true,
+      });
 
-    // Extract headers as a plain object
-    const responseHeaders: Record<string, string> = {};
-    response.headers.forEach((value, key) => {
-      responseHeaders[key.toLowerCase()] = value;
-    });
+      clearTimeout(timeoutId);
 
-    const responseBody = await response.text();
+      console.log(`[HTTP Client] Success: ${response.status} ${response.statusText}`);
 
-    return {
-      status: response.status,
-      statusText: response.statusText,
-      headers: responseHeaders,
-      body: responseBody,
-      redirected: response.redirected,
-      url: response.url,
-    };
-  } catch (error: any) {
-    clearTimeout(timeoutId);
+      // Extract headers as a plain object
+      const responseHeaders: Record<string, string> = {};
+      response.headers.forEach((value, key) => {
+        responseHeaders[key.toLowerCase()] = value;
+      });
 
-    if (error.name === 'AbortError') {
-      throw new HttpRequestError(`Request timed out after ${timeout}ms`);
+      // Handle response body with timeout
+      const bodyController = new AbortController();
+      const bodyTimeoutId = setTimeout(() => bodyController.abort(), 15000);
+      
+      let responseBody = '';
+      try {
+        responseBody = await response.text();
+        clearTimeout(bodyTimeoutId);
+      } catch (bodyError) {
+        clearTimeout(bodyTimeoutId);
+        console.warn('[HTTP Client] Failed to read response body, using empty string');
+        responseBody = '';
+      }
+
+      return {
+        status: response.status,
+        statusText: response.statusText,
+        headers: responseHeaders,
+        body: responseBody,
+        redirected: response.redirected,
+        url: response.url,
+      };
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+      lastError = error;
+
+      console.error(`[HTTP Client] Attempt ${attempt + 1} failed:`, error.message);
+
+      // Don't retry on abort errors (timeout)
+      if (error.name === 'AbortError') {
+        if (attempt < maxRetries) {
+          console.log(`[HTTP Client] Timeout, retrying in ${(attempt + 1) * 2}s...`);
+          await new Promise(resolve => setTimeout(resolve, (attempt + 1) * 2000));
+          continue;
+        }
+        throw new HttpRequestError(`Request timed out after ${timeout}ms. Target may be slow or blocking requests.`);
+      }
+
+      // Parse error details
+      const errorCode = error.cause?.code || error.code || '';
+      const errorMessage = error.message || '';
+
+      // Don't retry on certain errors
+      if (errorCode === 'ENOTFOUND' || errorMessage.includes('getaddrinfo')) {
+        throw new HttpRequestError('DNS lookup failed - domain name could not be resolved. Verify the domain is correct.');
+      }
+
+      if (errorCode === 'ECONNREFUSED') {
+        throw new HttpRequestError('Connection refused - target server is not accepting connections on this port.');
+      }
+
+      if (errorCode.includes('CERT') || errorCode.includes('SSL') || errorMessage.includes('certificate')) {
+        // Try HTTP if HTTPS fails
+        if (url.startsWith('https://') && attempt === 0) {
+          console.log('[HTTP Client] SSL error, will try HTTP on next attempt');
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          continue;
+        }
+        throw new HttpRequestError('SSL/TLS certificate error. Try using http:// instead of https://');
+      }
+
+      // Retry on network errors
+      if (attempt < maxRetries) {
+        const delay = (attempt + 1) * 2000; // Exponential backoff: 2s, 4s, 6s
+        console.log(`[HTTP Client] Network error, retrying in ${delay/1000}s...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
     }
-
-    throw new HttpRequestError(
-      error.message || 'HTTP request failed',
-      undefined,
-      undefined
-    );
   }
+
+  // All retries failed
+  let errorMessage = 'HTTP request failed after multiple attempts';
+  if (lastError) {
+    const errorCode = lastError.cause?.code || lastError.code || '';
+    const errorMsg = lastError.message || '';
+    
+    if (errorCode.includes('TIMEOUT') || errorMsg.includes('timeout')) {
+      errorMessage = 'Connection timeout - target is unreachable, too slow, or blocking automated requests';
+    } else if (errorCode === 'ENOTFOUND' || errorMsg.includes('getaddrinfo')) {
+      errorMessage = 'DNS lookup failed - domain name could not be resolved';
+    } else if (errorCode === 'ECONNREFUSED') {
+      errorMessage = 'Connection refused - target is not accepting connections';
+    } else if (errorCode.includes('CERT') || errorCode.includes('SSL') || errorMsg.includes('certificate')) {
+      errorMessage = 'SSL/TLS certificate error - invalid or expired certificate';
+    } else if (errorMsg.includes('CORS') || errorMsg.includes('blocked')) {
+      errorMessage = 'Request blocked by CORS policy or firewall';
+    } else if (errorMsg) {
+      errorMessage = `${errorMessage}: ${errorMsg}`;
+    }
+  }
+
+  throw new HttpRequestError(errorMessage, undefined, undefined);
 }
 
 /**

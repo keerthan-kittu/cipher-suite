@@ -2,6 +2,8 @@ import { renderToBuffer } from '@react-pdf/renderer';
 import { ReportGenerationRequest, VulnercipherReportData } from '../types/report';
 import { VulnercipherReport } from '../templates/vulnercipher-report.template';
 import { RedhawkReport, RedhawkReportData } from '../templates/redhawk-report.template';
+import { HoneypotReport, HoneypotReportData } from '../templates/honeypot-report.template';
+import { NMapReport } from '../templates/nmap-report.template';
 import React from 'react';
 
 export class ReportGeneratorService {
@@ -136,14 +138,18 @@ export class ReportGeneratorService {
           data: data as RedhawkReportData
         });
       
-      case 'nmap':
       case 'honeypot':
-        // For now, use the Vulnercipher template as a generic template
-        // TODO: Create specific templates for each scan type
-        return React.createElement(VulnercipherReport, { 
-          data: this.convertToGenericFormat(scanType, data),
-          title: config[scanType as keyof typeof config].title,
-          findingsLabel: config[scanType as keyof typeof config].findingsLabel
+        return React.createElement(HoneypotReport, {
+          data: data as HoneypotReportData
+        });
+      
+      case 'nmap':
+        return React.createElement(NMapReport, { 
+          data: {
+            ...data,
+            scanDate: data.scanDate || new Date().toISOString().split('T')[0],
+            scanType: 'NMap Network Scan',
+          },
         });
       
       default:
@@ -162,7 +168,7 @@ export class ReportGeneratorService {
         return {
           target: data.host || 'Unknown',
           scanDate,
-          vulnerabilities: data.openPorts?.map((port: any, index: number) => ({
+          vulnerabilities: data.openPorts?.map((port: any) => ({
             id: `port-${port.port}`,
             severity: port.state === 'open' ? 'medium' : 'low',
             title: `Port ${port.port} (${port.service})`,
@@ -185,8 +191,8 @@ export class ReportGeneratorService {
         return {
           target: data.target || 'Unknown',
           scanDate,
-          vulnerabilities: data.indicators?.map((indicator: any, index: number) => ({
-            id: `indicator-${index}`,
+          vulnerabilities: data.indicators?.map((indicator: any, idx: number) => ({
+            id: `indicator-${idx}`,
             severity: indicator.severity,
             title: indicator.type,
             description: indicator.description,

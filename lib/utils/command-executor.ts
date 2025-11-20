@@ -59,8 +59,15 @@ export async function executeCommand(
     env = process.env,
   } = options;
 
-  // Build the full command with escaped arguments
-  const fullCommand = `${command} ${args.map(arg => `"${arg}"`).join(' ')}`;
+  // Build the full command with properly escaped arguments
+  // Escape shell special characters to prevent command injection
+  const escapeShellArg = (arg: string): string => {
+    // Replace single quotes with '\'' and wrap in single quotes
+    // This is safer than double quotes which allow variable expansion
+    return `'${arg.replace(/'/g, "'\\''")}'`;
+  };
+  
+  const fullCommand = `${command} ${args.map(escapeShellArg).join(' ')}`;
 
   try {
     const { stdout, stderr } = await execAsync(fullCommand, {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import { VulnercipherReportData } from '../types/report';
+import { calculateSecurityScore } from '../utils/security-score';
 
 const styles = StyleSheet.create({
   page: {
@@ -244,6 +245,13 @@ const VulnerabilityItem: React.FC<VulnerabilityItemProps> = ({ vulnerability }) 
         {vulnerability.description}
       </Text>
       
+      {vulnerability.cause && (
+        <View style={styles.infoRow}>
+          <Text style={styles.infoLabel}>Root Cause:</Text>
+          <Text style={styles.infoValue}>{vulnerability.cause}</Text>
+        </View>
+      )}
+      
       <View style={styles.infoRow}>
         <Text style={styles.infoLabel}>Affected:</Text>
         <Text style={styles.infoValue}>{vulnerability.affected}</Text>
@@ -293,6 +301,62 @@ export const VulnercipherReport: React.FC<VulnercipherReportProps> = ({
 
         <View style={styles.summarySection}>
           <Text style={styles.sectionTitle}>Executive Summary</Text>
+          
+          {/* Security Score */}
+          {(() => {
+            const securityScore = calculateSecurityScore(data.summary);
+            return (
+              <View style={{
+                marginBottom: 15,
+                padding: 15,
+                backgroundColor: '#ffffff',
+                borderRadius: 4,
+                border: '2 solid #00B2A9',
+              }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <View>
+                    <Text style={{ fontSize: 12, color: '#64748b', marginBottom: 4 }}>
+                      Security Score
+                    </Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 5 }}>
+                      <Text style={{ fontSize: 36, fontWeight: 'bold', color: securityScore.color }}>
+                        {securityScore.score}
+                      </Text>
+                      <Text style={{ fontSize: 18, color: '#64748b' }}>/100</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', gap: 10, marginTop: 6 }}>
+                      <Text style={{
+                        fontSize: 11,
+                        fontWeight: 'bold',
+                        color: securityScore.color,
+                        padding: '4 10',
+                        backgroundColor: `${securityScore.color}20`,
+                        borderRadius: 3,
+                      }}>
+                        Grade {securityScore.grade}
+                      </Text>
+                      <Text style={{ fontSize: 11, fontWeight: 'bold', color: '#0f172a' }}>
+                        {securityScore.rating}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: 40,
+                    border: `8 solid ${securityScore.color}`,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    <Text style={{ fontSize: 20, fontWeight: 'bold', color: securityScore.color }}>
+                      {securityScore.score}%
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            );
+          })()}
+          
           <View style={styles.summaryGrid}>
             <SeverityBadge severity="critical" count={data.summary.critical} />
             <SeverityBadge severity="high" count={data.summary.high} />

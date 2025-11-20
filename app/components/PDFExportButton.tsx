@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Button, CircularProgress } from '@mui/material';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import { Icons } from './Icons';
 
 interface PDFExportButtonProps {
   scanType: 'honeypot' | 'nmap' | 'redhawk' | 'vulnercipher';
@@ -84,32 +83,17 @@ export const PDFExportButton: React.FC<PDFExportButtonProps> = ({
 
   return (
     <div>
-      <Button
-        variant="contained"
-        color="primary"
-        startIcon={isGenerating ? <CircularProgress size={20} color="inherit" /> : <PictureAsPdfIcon />}
+      <button
         onClick={handleExport}
         disabled={disabled || isGenerating}
-        sx={{
-          textTransform: 'none',
-          fontWeight: 600,
-          px: 3,
-          py: 1.5,
-        }}
+        className="flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-white font-bold hover:bg-gold-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
+        {isGenerating ? <span className="animate-spin">⟳</span> : <Icons.PictureAsPdf />}
         {isGenerating ? 'Generating PDF...' : 'Download PDF Report'}
-      </Button>
+      </button>
       
       {error && (
-        <div style={{ 
-          marginTop: '12px', 
-          padding: '12px', 
-          backgroundColor: '#fee2e2', 
-          border: '1px solid #dc2626',
-          borderRadius: '4px',
-          color: '#991b1b',
-          fontSize: '14px',
-        }}>
+        <div className="mt-3 p-3 bg-red-100 border border-red-500 rounded text-red-900 text-sm">
           <strong>Error:</strong> {error}
         </div>
       )}

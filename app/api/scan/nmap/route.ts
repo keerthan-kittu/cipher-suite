@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { config } from '@/lib/config/env.config';
+import { PortScanner } from '@/lib/services/port-scanner.service';
 
 interface NMapScanRequest {
   target: string;
@@ -29,12 +29,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Simulate scanning delay based on scan type (only in simulation mode)
-    const scanDuration = config.scanDelays.nmap[body.scanType] || config.scanDelays.nmap.quick;
-    await new Promise(resolve => setTimeout(resolve, scanDuration));
+    // Map scan types
+    const scanTypeMap: Record<string, 'quick' | 'full' | 'stealth' | 'version' | 'os'> = {
+      'quick': 'quick',
+      'full': 'full',
+      'stealth': 'stealth',
+      'aggressive': 'version', // Aggressive = version detection
+    };
 
-    // Generate realistic scan results
-    const result = generateNMapResults(body.target, body.scanType);
+    const mappedScanType = scanTypeMap[body.scanType] || 'quick';
+
+    // Perform REAL port scan
+    console.log(`[NMap API] Starting REAL ${mappedScanType} scan for ${body.target}`);
+    const scanner = new PortScanner();
+    const result = await scanner.scan(body.target, mappedScanType);
+    console.log(`[NMap API] Scan complete: ${result.openPorts.length} open ports found`);
 
     return NextResponse.json({
       success: true,
@@ -45,53 +54,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to perform network scan',
+        error: error instanceof Error ? error.message : 'Failed to perform network scan',
       },
       { status: 500 }
     );
   }
-}
-
-function generateNMapResults(target: string, scanType: string) {
-  const commonPorts = [
-    { port: 22, protocol: 'tcp', state: 'open', service: 'ssh', version: 'OpenSSH 8.2' },
-    { port: 80, protocol: 'tcp', state: 'open', service: 'http', version: 'nginx 1.18.0' },
-    { port: 443, protocol: 'tcp', state: 'open', service: 'https', version: 'nginx 1.18.0' },
-  ];
-
-  const additionalPorts = [
-    { port: 21, protocol: 'tcp', state: 'open', service: 'ftp', version: 'vsftpd 3.0.3' },
-    { port: 25, protocol: 'tcp', state: 'open', service: 'smtp', version: 'Postfix' },
-    { port: 3306, protocol: 'tcp', state: 'open', service: 'mysql', version: 'MySQL 8.0.23' },
-    { port: 5432, protocol: 'tcp', state: 'open', service: 'postgresql', version: 'PostgreSQL 13.2' },
-    { port: 6379, protocol: 'tcp', state: 'open', service: 'redis', version: 'Redis 6.2.0' },
-    { port: 8080, protocol: 'tcp', state: 'open', service: 'http-proxy', version: 'Squid 4.10' },
-    { port: 27017, protocol: 'tcp', state: 'open', service: 'mongodb', version: 'MongoDB 4.4.0' },
-  ];
-
-  let openPorts = [...commonPorts];
-
-  // Add more ports based on scan type
-  if (scanType === 'full' || scanType === 'aggressive') {
-    openPorts = [...openPorts, ...additionalPorts];
-  } else if (scanType === 'quick') {
-    // Quick scan only shows most common ports
-    openPorts = commonPorts.slice(0, 3);
-  }
-
-  // Determine OS based on open ports
-  let os = 'Linux 5.4.0';
-  if (openPorts.some(p => p.port === 3389)) {
-    os = 'Windows Server 2019';
-  } else if (openPorts.some(p => p.port === 548)) {
-    os = 'macOS 11.0';
-  }
-
-  return {
-    host: target,
-    status: 'up',
-    openPorts,
-    os: scanType === 'aggressive' ? os : 'Unknown',
-    latency: `${(Math.random() * 5 + 1).toFixed(2)}ms`,
-  };
 }

@@ -2,22 +2,22 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="flex flex-col gap-8 px-5 py-10 text-center border-t border-gray-300 dark:border-white/10 mt-16 bg-white dark:bg-transparent">
+    <footer className="flex flex-col gap-8 px-5 py-10 text-center border-t border-primary/20 mt-16 bg-black">
       <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
-        <Link className="text-sm font-normal leading-normal text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" href="/about">
+        <Link className="text-sm font-normal leading-normal text-white/60 hover:text-primary transition-colors" href="/about">
           About Us
         </Link>
-        <Link className="text-sm font-normal leading-normal text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" href="/contact">
+        <Link className="text-sm font-normal leading-normal text-white/60 hover:text-primary transition-colors" href="/contact">
           Contact
         </Link>
-        <Link className="text-sm font-normal leading-normal text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" href="/privacy">
+        <Link className="text-sm font-normal leading-normal text-white/60 hover:text-primary transition-colors" href="/privacy">
           Privacy Policy
         </Link>
-        <Link className="text-sm font-normal leading-normal text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors" href="/terms">
+        <Link className="text-sm font-normal leading-normal text-white/60 hover:text-primary transition-colors" href="/terms">
           Terms of Service
         </Link>
       </div>
-      <p className="text-sm font-normal leading-normal text-gray-500">
+      <p className="text-sm font-normal leading-normal text-white/60">
         © 2024 Cipher Suite Inc. All rights reserved.
       </p>
     </footer>

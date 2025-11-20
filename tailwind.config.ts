@@ -1,31 +1,37 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: "class",
   content: [
-    "./app/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./lib/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
       colors: {
-        primary: "#2b8cee",
-        "background-light": "#f6f7f8",
-        "background-dark": "#0A0E12",
-        "surface-dark": "#101922",
+        primary: "#00B2A9",
+        gold: {
+          DEFAULT: "#00B2A9",
+          light: "#00D4C8",
+          dark: "#008F88",
+        },
+        "background-dark": "#000000",
+        "surface-dark": "#0A0A0A",
+        "surface-elevated": "#141414",
+        severity: {
+          critical: "#DC2626",
+          high: "#F97316",
+          medium: "#EAB308",
+          low: "#00B2A9",
+        },
       },
       fontFamily: {
         display: ["Inter", "sans-serif"],
       },
-      borderRadius: {
-        DEFAULT: "0.25rem",
-        lg: "0.5rem",
-        xl: "0.75rem",
-        full: "9999px",
-      },
       boxShadow: {
-        "glow-sm": "0 0 15px rgba(43, 140, 238, 0.1)",
-        "glow-md": "0 0 30px rgba(43, 140, 238, 0.15)",
+        "glow-sm": "0 0 15px rgba(37, 99, 235, 0.2)",
+        "glow-md": "0 0 30px rgba(37, 99, 235, 0.3)",
+        "glow-lg": "0 0 45px rgba(37, 99, 235, 0.4)",
       },
     },
   },

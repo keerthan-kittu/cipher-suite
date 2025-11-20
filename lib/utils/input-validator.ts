@@ -93,12 +93,14 @@ export function isPrivateIP(ip: string): boolean {
 
 /**
  * Sanitizes input to prevent command injection
- * Removes or escapes dangerous characters
+ * Removes or escapes dangerous characters while preserving valid URL characters
  */
 export function sanitizeInput(input: string): string {
-  // Remove any characters that could be used for command injection
-  // Keep only alphanumeric, dots, hyphens, underscores, colons, and forward slashes
-  return input.replace(/[^a-zA-Z0-9.\-_:/]/g, '');
+  // Remove dangerous shell characters that could be used for command injection
+  // Keep alphanumeric, dots, hyphens, underscores, colons, forward slashes, 
+  // question marks, equals, ampersands, and percent signs (for URLs)
+  // Remove: semicolons, pipes, backticks, dollar signs, parentheses, etc.
+  return input.replace(/[;|`$(){}[\]<>&!\\'"]/g, '');
 }
 
 /**
