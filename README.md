@@ -1,6 +1,32 @@
 # 🛡️ Cipher Suite - Complete Security Scanning Platform
 
+[![GitHub stars](https://img.shields.io/github/stars/keerthan-kittu/cipher-suite?style=social)](https://github.com/keerthan-kittu/cipher-suite/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/keerthan-kittu/cipher-suite?style=social)](https://github.com/keerthan-kittu/cipher-suite/network/members)
+[![GitHub issues](https://img.shields.io/github/issues/keerthan-kittu/cipher-suite)](https://github.com/keerthan-kittu/cipher-suite/issues)
+[![GitHub license](https://img.shields.io/github/license/keerthan-kittu/cipher-suite)](https://github.com/keerthan-kittu/cipher-suite/blob/main/LICENSE)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
+
 A comprehensive web-based security scanning and reconnaissance platform with 4 powerful tools for penetration testing, vulnerability assessment, and threat intelligence.
+
+## ⭐ Star this repo if you find it useful!
+
+![Cipher Suite Demo](https://img.shields.io/badge/Status-Production%20Ready-success)
+
+---
+
+## ✨ Key Features
+
+- 🕵️ **RedHawk Intelligence** - DNS enumeration, WHOIS lookup, subdomain discovery
+- 🔍 **Nmap Scanner** - Port scanning, service detection, OS fingerprinting
+- 🍯 **Honeypot Detection** - Detect decoy systems + comprehensive security assessment
+- 🔐 **VulnerCipher** - SSL/TLS vulnerability scanning and cipher analysis
+- 📊 **PDF Reports** - Export detailed reports for all scans
+- 💯 **Security Scoring** - 0-100 score with letter grades (A+ to F)
+- ✅ **Compliance Checking** - GDPR, PCI DSS, OWASP validation
+- 🎯 **Real-time Analysis** - No simulations, all scans are live
+- 🌐 **Modern UI** - Built with Next.js 14 and TypeScript
+- 📱 **Responsive Design** - Works on desktop, tablet, and mobile
 
 ---
 
@@ -375,15 +401,114 @@ sudo apt install nmap
 
 ---
 
+## 📸 Screenshots
+
+### Dashboard
+![Dashboard](https://via.placeholder.com/800x400/1a1a1a/ffffff?text=Cipher+Suite+Dashboard)
+
+### Honeypot Detection with Security Assessment
+![Honeypot Detection](https://via.placeholder.com/800x400/1a1a1a/ffffff?text=Honeypot+Detection+%26+Security+Assessment)
+
+### Nmap Port Scanner
+![Nmap Scanner](https://via.placeholder.com/800x400/1a1a1a/ffffff?text=Nmap+Port+Scanner)
+
+### PDF Report Export
+![PDF Reports](https://via.placeholder.com/800x400/1a1a1a/ffffff?text=PDF+Report+Generation)
+
+---
+
 ## 🤝 Contributing
 
-Found a bug or want to add features? Contributions welcome!
+Contributions are welcome! Here's how you can help:
+
+1. **Fork the repository**
+2. **Create a feature branch** (`git checkout -b feature/AmazingFeature`)
+3. **Commit your changes** (`git commit -m 'Add some AmazingFeature'`)
+4. **Push to the branch** (`git push origin feature/AmazingFeature`)
+5. **Open a Pull Request**
+
+### Ideas for Contributions:
+- Add more scanning tools
+- Improve vulnerability detection
+- Add more export formats (JSON, CSV, XML)
+- Enhance UI/UX
+- Add authentication system
+- Implement scan scheduling
+- Add API endpoints
+- Improve documentation
+- Add unit tests
+
+---
+
+## 🐛 Bug Reports
+
+Found a bug? Please open an issue with:
+- Description of the bug
+- Steps to reproduce
+- Expected behavior
+- Screenshots (if applicable)
+- Your environment (OS, browser, Node version)
+
+---
+
+## 💡 Feature Requests
+
+Have an idea? Open an issue with the `enhancement` label and describe:
+- The feature you'd like
+- Why it would be useful
+- How it should work
+
+---
+
+## �️ Teech Stack
+
+### Frontend
+- **Next.js 14** - React framework with App Router
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first styling
+- **React PDF** - PDF report generation
+
+### Backend
+- **Node.js** - Runtime environment
+- **Next.js API Routes** - Serverless functions
+- **Nmap** - Network scanning
+- **DNS/WHOIS** - Domain intelligence
+
+### Tools & Libraries
+- `@react-pdf/renderer` - PDF generation
+- `whois-json` - WHOIS lookups
+- `dns` - DNS queries
+- Custom HTTP client for security scanning
+
+---
+
+## 📊 Project Stats
+
+- **4 Security Tools** - Comprehensive scanning suite
+- **Real-time Analysis** - No simulations or fake data
+- **PDF Export** - Professional reports
+- **100% TypeScript** - Type-safe codebase
+- **Responsive Design** - Mobile-friendly
+- **Open Source** - MIT License
+
+---
+
+## 🌟 Show Your Support
+
+If you find this project useful, please consider:
+- ⭐ Starring the repository
+- 🐛 Reporting bugs
+- 💡 Suggesting new features
+- 🔀 Contributing code
+- 📢 Sharing with others
 
 ---
 
 ## 📄 License
 
-This tool is for educational and authorized testing only. Use responsibly.
+MIT License - see the [LICENSE](LICENSE) file for details.
+
+**Disclaimer:** This tool is for educational and authorized testing only. Unauthorized scanning may be illegal. Always obtain permission before testing systems you don't own. Use responsibly and ethically.
 
 ---
 
@@ -398,3 +523,33 @@ This platform is designed for:
 - DevOps engineers
 
 **Remember:** With great power comes great responsibility. Always use these tools ethically and legally.
+
+---
+
+## 👨‍💻 Author
+
+**Keerthan Kittu**
+- GitHub: [@keerthan-kittu](https://github.com/keerthan-kittu)
+- Repository: [cipher-suite](https://github.com/keerthan-kittu/cipher-suite)
+
+---
+
+## 🙏 Acknowledgments
+
+- [Nmap](https://nmap.org/) - Network scanning tool
+- [OWASP](https://owasp.org/) - Security guidelines
+- [Next.js](https://nextjs.org/) - React framework
+- [Tailwind CSS](https://tailwindcss.com/) - CSS framework
+- All contributors and users of this project
+
+---
+
+## 📞 Contact & Support
+
+- **Issues**: [GitHub Issues](https://github.com/keerthan-kittu/cipher-suite/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/keerthan-kittu/cipher-suite/discussions)
+- **Security**: For security issues, please email privately instead of opening a public issue
+
+---
+
+Made with ❤️ for the cybersecurity community
